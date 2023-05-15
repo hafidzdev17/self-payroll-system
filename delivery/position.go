@@ -106,23 +106,25 @@ func (p *positionDelivery) DeletePositionHandler(c echo.Context) error {
 func (p *positionDelivery) EditPositionHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 
+	//TODO: lakukan validasi request disini
 	var req request.PositionRequest
 
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusUnprocessableEntity, err.Error())
+		return helper.ResponseValidationErrorJson(c, "Error binding struct", err.Error())
 	}
 
 	if err := req.Validate(); err != nil {
 		errVal := err.(validation.Errors)
 		return helper.ResponseValidationErrorJson(c, "Error validation", errVal)
 	}
+	//EOL
 
 	id := c.Param("id")
 	IdInt, _ := strconv.Atoi(id)
 
-	position, err := p.positionUsecase.EditPosition(ctx, IdInt, &request.PositionRequest{})
+	position, err := p.positionUsecase.EditPosition(ctx, IdInt, &req)
 	if err != nil {
-		return err
+		return helper.ResponseErrorJson(c, http.StatusUnprocessableEntity, err)
 	}
 
 	return helper.ResponseSuccessJson(c, "Success edit", position)
