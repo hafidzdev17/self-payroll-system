@@ -16,7 +16,17 @@ func InitGorm() *gorm.DB {
 	if err != nil {
 		log.Error().Msgf("cant connect to database %s", err)
 	}
-	db.AutoMigrate(&model.Position{}, &model.User{}, &model.Company{}, &model.Transaction{})
+
+	if err := db.AutoMigrate(
+		&model.Position{},
+		&model.User{},
+		&model.Company{},
+		&model.Transaction{},
+	); err != nil {
+		log.Error().Msgf("Auto migrate error %s", err)
+	} else {
+		log.Info().Msg("Auto migrate successful")
+	}
 
 	return db
 
